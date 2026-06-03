@@ -32,7 +32,7 @@ const regUser = async (req, res) => {
         console.log("new user:", newUser);
         const isAdmin = newUser.isAdmin ?? false;
         const token = jwt.sign({id : newUser._id , isAdmin}, "yoursecretkey", {expiresIn: "7d"});
-        return res.status(201).json({ message: "User created successfully", token, name: newUser.name, isAdmin });
+        return res.status(201).json({ id: newUser._id , message: "User created successfully", token, name: newUser.name, isAdmin,email: newUser.email });
 
     } catch (err) {
         console.error(err);
@@ -61,7 +61,7 @@ const logUser = async (req, res) => {
             { expiresIn: "7d" }
         );
         console.log(user);
-        return res.json({ token , name: user.name , isAdmin: user.isAdmin});
+        return res.json({ id: user.id, token , name: user.name , isAdmin: user.isAdmin , email: user.email});
 
     } catch (err) {
         console.error(err);
@@ -69,4 +69,21 @@ const logUser = async (req, res) => {
     }
 };
 
-module.exports = { regUser, logUser };
+const editUser = async (req,res) => {
+ try {   
+    const {toChange} = req.body;
+    if(toChange.password) {
+        toChange.password = await bcrypt.hash(toChange.password,10);
+    }
+    const updatedUser = await User.findByIdAndUpdate(req.user.id,toChange,{
+        new:true,
+        runValidators:true
+    })
+    res.status(200).json({message:"Successful edit", updatedUser});
+    } catch(e) {
+        console.error(e);
+        res.status(500).json({error: "Server error"});
+    }
+}; 
+
+module.exports = { regUser, logUser, editUser };

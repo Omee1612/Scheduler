@@ -26,7 +26,7 @@ const Login = () => {
         console.log("login response : ", res.data);
         setMessage(res.data.message || "Logged in!");
        console.log("res.data:", res.data)
-        login({ token: res.data.token, name: res.data.name, isAdmin: res.data.isAdmin })
+        login({ token: res.data.token, name: res.data.name, isAdmin: res.data.isAdmin , id:res.data.id , email:res.data.email })
         navigate("/");
        } catch(e) {
         console.error(e);

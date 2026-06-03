@@ -45,7 +45,7 @@ export const AuthProvider = ({children}) => {
         return () => axios.interceptors.response.eject(interceptor);
     }, [])
     return (
-        <AuthContext.Provider value={{user,login,logout}}>
+        <AuthContext.Provider value={{user,setUser,login,logout}}>
             {children}
         </AuthContext.Provider>
     )
