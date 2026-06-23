@@ -16,6 +16,10 @@ const item = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    purchased: {
+        type: Boolean,
+        default: false
     }
 })
 

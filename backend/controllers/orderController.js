@@ -1,6 +1,7 @@
 const Order = require("../models/order");
 const Item = require("../models/item");
 const SSLCommerzPayment = require("sslcommerz-lts");
+const { default: mongoose } = require("mongoose");
 exports.sendOrder = async(req,res) => {
     try {
         const { name, address, phone, itemId, paymentmthd } = req.body;
@@ -11,12 +12,14 @@ exports.sendOrder = async(req,res) => {
             return res.status(400).json({error: "One of the fields is empty"});
         }
         const newOrder = new Order({
+            userId:req.user.id,
             name,
             address,
             phone,
             itemName: item.name,
             itemPrice: item.price,
-            paymentmthd
+            paymentmthd,
+            itemId
         });
         await newOrder.save();
         console.log("saved order: ", newOrder.toObject());
@@ -32,17 +35,32 @@ const isLive=false
 
 exports.paymentBkash = async(req,res) => {
     try {
-        const {itemId} = req.body;
+        const { name, address, phone, itemId, paymentmthd } = req.body;
         const item = await Item.findById(itemId);
-        if(!item) {
-            return res.status(400).json({error: "No such item"});
+        if (!item || !paymentmthd) 
+        {
+             console.log("req.body: ", req.body);
+            return res.status(400).json({error: "One of the fields is empty"});
         }
+        const newOrder = new Order({
+            userId:req.user.id,
+            name,
+            address,
+            phone,
+            itemName: item.name,
+            itemPrice: item.price,
+            paymentmthd,
+            itemId
+        });
+        await newOrder.save();
+        console.log("saved order: ", newOrder.toObject());
+        console.log("req.body: ", req.body);
         const data = {
         total_amount: item.price,
         currency: 'BDT',
         tran_id: itemId, // use unique tran_id for each api call
         success_url: `http://localhost:5000/api/orders/success/${itemId}`,
-        fail_url: 'http://localhost:5000/fail',
+        fail_url: `http://localhost:5000/api/orders/failed/${itemId}`,
         cancel_url: 'http://localhost:5000/cancel',
         ipn_url: 'http://localhost:5000/ipn',
         shipping_method: 'Courier',
@@ -90,4 +108,52 @@ exports.getOrders = async(req,res) => {
         return res.status(400).json({e});
     }
     
+}
+
+exports.successOrder = async (req,res) => {
+    try
+    {   
+    const {itemId} = req.params;
+    const updatedItem = await Item.findByIdAndUpdate(itemId,{
+        purchased: true
+    })
+    res.redirect("http://localhost:5173/cat");
+    } catch (e)
+    {
+        console.error(e);
+        return res.status(500).json({error: "server error"});
+    }
+}
+
+exports.failOrder = async (req,res) => {
+    try {
+        const {itemId} = req.params;
+        const deletion = await Order.deleteOne({itemId});
+        return res.redirect("http://localhost:5173/payfail?from=sslcommerz");
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json(e);
+    }
+}
+
+exports.selfOrder = async (req,res) => {
+    try {
+        const userId = req.user.id;
+        const specificOrders = await Order.find({userId});
+        return res.json({message:"Retrieving orders for the user," , specificOrders});
+    } catch(e) {
+        console.error(e);
+        return res.status(500).json({message: "Server error"});
+    }
+}
+
+exports.deleteOrder = async (req,res) => {
+    try {
+        const {orderId} = req.params;
+        const deletedOrder = await Order.findByIdAndDelete(orderId);
+        return res.json({message: "Successfully deleted", deletedOrder});
+    } catch(e)  {
+        console.error(e);
+        return res.json({error: "Server error"});
+    }
 }

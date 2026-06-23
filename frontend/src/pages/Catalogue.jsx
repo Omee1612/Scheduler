@@ -24,15 +24,18 @@ const Catalogue = () => {
     if(user)
     {
         return (
-        <div className="grid grid-cols-4 gap-6 p-6 w-full items-start"> {/* Container of cards */}
+        <div className="grid grid-cols-4 gap-6 p-6 w-screen "> {/* Container of cards */}
         {items.map( item => (
-            <div key={item._id} className="border rounded-lg overflow-hidden shadow-sm flex flex-col">
-            <img src={item.imgURL} className="w-fit h-fit object-cover"/>
-                <div className="p-4 flex flex-col gap-2">
+            <div key={item._id} className="rounded-lg bg-pink-200 overflow-hidden shadow-sm flex flex-col">
+            <img src={item.imgURL} className="w-full h-96 object-cover shrink-0"/>
+                <div className="p-4 flex flex-1 flex-col gap-2">
+                    <div>
                     <h2 className="font-medium">{item.name}</h2>
                     <p className="text-xs text-gray-400">Added: {format(item.date,'dd MMM,yyyy')}</p>
                     <p className="font-semibold text-amber-600">{item.price} BDT</p>
-                    <button className="bg-green-400 font-bold text-white p-2" onClick={() => {
+                    </div>
+                    <div className="mt-auto">
+                    {!item.purchased && <button className="bg-green-400 font-bold text-white p-2 w-full" onClick={() => {
         navigate("/order",{
             state: {
                 name: item.name,
@@ -43,6 +46,14 @@ const Catalogue = () => {
         })
     }}>
         Add Order</button>
+        }
+        {
+            item.purchased && <button className="bg-red-400 font-bold text-white p-2 w-full" onClick={() => {
+                alert("This product is not in stock");
+            }}>
+        Out of Stock</button>
+        }
+        </div>
                 </div>
             </div>
         ))

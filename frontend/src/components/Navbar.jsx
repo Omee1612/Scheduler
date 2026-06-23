@@ -4,7 +4,7 @@ import { BiCog } from "react-icons/bi";
 import { useState } from "react";
 
 const Navbar = () => {
-    const options = ['Profile','Orders','Contact Support','Logout'];
+    const options = ['Profile','Orders','Contact Support','Support Chats','Logout'];
     const [isOpen,setIsOpen] = useState(false);
     const {user,logout} = useAuth();
     const navigate = useNavigate();
@@ -14,7 +14,12 @@ const Navbar = () => {
       <div className="flex gap-4"><NavLink to="/" className = "">Home</NavLink>
       {
         user?.isAdmin ? (
-            <><NavLink to="/adm">Manage Store</NavLink><NavLink to="/ordercat">See Orders</NavLink></>
+            <><NavLink to="/adm">Manage Store
+            </NavLink>
+            <NavLink to="/ordercat">See Orders</NavLink>
+            <NavLink to ="/cmplog">See Complaints</NavLink>
+            </>
+            
         ) : ``
       }
       <NavLink to ="/cat">Catalogue</NavLink>
@@ -34,11 +39,26 @@ const Navbar = () => {
                             key={option} onClick={() => {
                                 if(option === "Logout") {
                                     setIsOpen(false);
+                                    navigate("/");
                                     logout();
+                                }
+                                else if (option === "Orders")
+                                {
+                                    setIsOpen(false);
+                                    navigate("/selforder");
                                 }
                                 else if(option === "Profile") {
                                     setIsOpen(false);
                                     navigate("/prof");
+                                }
+                                
+                                else if (option === "Contact Support") {
+                                    setIsOpen(false);
+                                    navigate("/serv");
+                                }
+                                else if (option === "Support Chats") {
+                                    setIsOpen(false);
+                                    navigate("/usercomp");
                                 }
                             }}>{option}</button>
                         )

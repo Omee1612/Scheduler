@@ -6,10 +6,11 @@ const middleware = require("../middleware/auth");
 // public routes
 router.post("/register", userController.regUser);
 router.post("/login", userController.logUser);
+router.post("/edit",middleware.verifyTok,userController.editUser);
 
 // protected example route
 router.get("/profile", middleware.verifyTok, (req, res) => {
     res.json({ userId: req.user.id });
 });
-router.post("/edit",middleware.verifyTok,userController.editUser);
+
 module.exports = router;

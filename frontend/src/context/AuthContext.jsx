@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { createContext,useContext } from "react";
 import { useState } from "react";
+import socket from "../socket";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({children}) => {
@@ -31,6 +32,7 @@ export const AuthProvider = ({children}) => {
     };
     const logout = () => {
         setUser(null);
+        socket.disconnect();
         localStorage.removeItem("user");
     };
  useEffect(() => {

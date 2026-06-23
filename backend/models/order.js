@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const Order = new mongoose.Schema({
+    userId: {
+        required: true,
+        type: mongoose.Schema.Types.ObjectId
+    },
     name: {
         required: true,
         type: String
@@ -28,6 +32,10 @@ const Order = new mongoose.Schema({
     paymentmthd : {
         type: String,
         required: true
+    },
+    itemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Item"
     }
 })
 

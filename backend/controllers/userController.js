@@ -31,7 +31,7 @@ const regUser = async (req, res) => {
         await newUser.save();
         console.log("new user:", newUser);
         const isAdmin = newUser.isAdmin ?? false;
-        const token = jwt.sign({id : newUser._id , isAdmin}, "yoursecretkey", {expiresIn: "7d"});
+        const token = jwt.sign({id : newUser._id , name: user.name, isAdmin}, "yoursecretkey", {expiresIn: "7d"});
         return res.status(201).json({ id: newUser._id , message: "User created successfully", token, name: newUser.name, isAdmin,email: newUser.email });
 
     } catch (err) {
@@ -56,12 +56,12 @@ const logUser = async (req, res) => {
             return res.status(401).json({ error: "Invalid credentials" });
         }
         const token = jwt.sign(
-            { id: user._id , isAdmin: user.isAdmin},
+            { id: user._id , name: user.name , isAdmin: user.isAdmin},
             process.env.JWT_SECRET || "yoursecretkey",
             { expiresIn: "7d" }
         );
         console.log(user);
-        return res.json({ id: user.id, token , name: user.name , isAdmin: user.isAdmin , email: user.email});
+        return res.json({ id: user._id, token , name: user.name , isAdmin: user.isAdmin , email: user.email});
 
     } catch (err) {
         console.error(err);

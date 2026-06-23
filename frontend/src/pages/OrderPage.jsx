@@ -23,9 +23,15 @@ const OrderPage = () => {
     }
     const handlePayment = async (e) => {
         e.preventDefault();
+         if(!formData.name || !formData.phone || !formData.address)
+        {
+            setMessage("Fill out every detail");
+        }
+        else {
         try {
             const res = await axios.post("/api/orders/payment", { ...formData,
-                itemId: location.state.itemId
+                itemId: location.state.itemId,
+                paymentmthd:payment
             }, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
@@ -39,9 +45,15 @@ const OrderPage = () => {
             setMessage(e.response?.data?.error || "Error handling payment.");
         }
     }
+}
     const handleSubmit = async (e) => {
          e.preventDefault();
         console.log("payment at submit time:", payment) 
+        if(!formData.name || !formData.phone || !formData.address)
+        {
+            setMessage("Fill out every detail");
+        }
+        else {
         try {
             const res = await axios.post("/api/orders/orderlist",{
                 ...formData, itemId: location.state.itemId, paymentmthd: payment
@@ -56,6 +68,7 @@ const OrderPage = () => {
             console.error(e);
             setMessage(e.response?.data?.error || "Error sending order of requested item");
         }
+    }
     }
     if(!location.state) return <Navigate to="/cat" replace /> 
     return (
